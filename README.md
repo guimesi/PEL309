@@ -1,155 +1,178 @@
-# NLP – Análise de Sentimentos em Tweets em Português 🇧🇷
+# LID‑22 — Identificação de Idiomas em 22+ Línguas 🌍
 
-Projeto completo de **Processamento de Linguagem Natural (PLN)** para **análise de sentimento** em português usando o dataset do Kaggle **“Portuguese Tweets for Sentiment Analysis”** (positivo/negativo/neutro). O projeto inclui todas as etapas da ciência de dados, com **pré-processamento**, **tokenização**, **normalização**, **remoção de símbolos**, **stopwords**, **stemming e lematização**, vetorização com **TF‑IDF** e **caracteres**, criação de **embeddings** (*FastText* via *gensim*), **seleção/treinamento de modelos**, **comparação por métricas**, explicabilidade com **LIME** e **deploy** via CLI e **API FastAPI**.
+Pipeline **reprodutível** de *Language Identification (LID)* cobrindo 22+ línguas, com foco em **simplicidade, robustez e rastreabilidade**. O projeto entrega um fluxo completo: **EDA**, *split* **estratificado por grupos** (hash do texto normalizado, para evitar vazamento), seleção de modelos via **GridSearchCV / HalvingGridSearchCV**, **diagnósticos anti-overfitting** (OOF, *learning curve*, **Y‑scramble**), **métricas por classe e por grupo de *script*** (Latin/CJK/Árabe etc.), **Top‑3 accuracy**, salvamento de **artefatos e metadados**.
 
-**Dataset:** Kaggle – *Portuguese Tweets for Sentiment Analysis*. Classes: *positive*, *negative*, *neutral*. Os arquivos incluem colunas como `id`, `tweet_text`, `tweet_date`, `sentiment`, `query_used` (conforme descrito por repositórios que utilizam esse dataset).
-
----
-
-## 🔧 Stack e principais bibliotecas
-
-- Python 3.9+
-- `pandas`, `numpy`
-- `scikit-learn` (modelos clássicos + métricas)
-- `nltk` (stopwords e stemmer RSLP pt-br)
-- `spacy` (opcional, lematização com `pt_core_news_sm`)
-- `gensim` (embeddings FastText treinados no próprio corpus)
-- `joblib` (persistência de artefatos)
-- `matplotlib` (gráficos de avaliação)
-- `kaggle` (download do dataset via API)
-- `lime` (explicabilidade por instância)
-- `fastapi` + `uvicorn` (serviço de inferência)
-
-> Extras opcionais: `xgboost`, `torch`/`tensorflow` e `transformers` (para modelos mais pesados).
+> **Código principal:** `lid22.py` (executável direto)  
+> **Dataset:** Kaggle — *language-identification-datasst* (Zara Jamshaid). O download é automático via **kagglehub** ou você pode definir o caminho manualmente via `LANGID_CSV`.
 
 ---
 
-## 🗂️ Estrutura de Pastas e Arquivos
+## 🔧 Stack (núcleo) e opcionais
+
+- Python 3.9+  
+- **Núcleo:** `pandas`, `numpy`, `scikit-learn`, `matplotlib`, `joblib`, `kagglehub`
+- **Opcionais (ativados automaticamente se instalados):**
+  - `gensim` → **Word2Vec/Doc2Vec**
+  - `xgboost` → **XGBoost** (com `XGB_USE_GPU=1` para `gpu_hist`, se houver GPU)
+
+---
+
+## 🗂️ Estrutura de saídas (artefatos)
+
+Ao rodar o script, a pasta `artifacts/` é criada com:
 
 ```
-nlp_pt_sa/
-├── README.md
-├── requirements.txt
-├── config/
-│   └── config.yml.txt
-├── data/
-│   ├── raw/          # CSVs originais do Kaggle (após download)
-│   └── processed/    # Dados limpos e prontos p/ modelagem
-├── models/
-│   ├── artifacts/    # Vetorizadores, modelos e pipeline salvos
-│   └── reports/      # Métricas, gráficos e leaderboard
-├── scripts/          # Cada etapa do pipeline em .txt (executável em Python)
-│   ├── 00_setup_env.txt
-│   ├── 01_download_kaggle.txt
-│   ├── 02_preprocess.txt
-│   ├── 03_vectorize_train_baselines.txt
-│   ├── 04_embeddings_fasttext_train.txt
-│   ├── 05_evaluate_compare.txt
-│   ├── 06_inference_cli.txt
-│   └── 07_api_fastapi.txt
-└── utils/
-    ├── text_utils.txt
-    └── ml_utils.txt
+artifacts/
+├── run_YYYYmmdd-HHMMSS.txt                 # log completo da execução
+├── plots_YYYYmmdd-HHMMSS/                  # todas as figuras geradas (EDA, matrizes, etc.)
+├── cv_results_<experimento>.csv            # resultados do GridSearch por experimento
+├── validation_results.csv                   # leaderboard de validação (macro‑F1)
+├── classification_report_test_<best>.json   # relatório no TEST
+├── errors_test_<best>.csv                   # amostras de erros (por par y_true/y_pred)
+├── best_langid_<best>.joblib                # pipeline final salvo (train+val → test)
+├── diag_text_leakage.json                   # duplicatas e *leakage* entre splits
+├── oof_report_<best>.json                   # OOF (F1 macro + relatório)
+├── learning_curve_<best>.csv                # learning curve (F1 macro) + figura
+├── diag_y_scramble_<best>.csv               # distribuição de scores com rótulos embaralhados
+└── metadata_ext.json                        # metadados consolidados do experimento
 ```
 
-> **Observação:** Todos os **códigos** do pipeline estão em **`.txt`** conforme solicitado. O Python consegue executar arquivos `.txt` normalmente: `python scripts/02_preprocess.txt`. Se preferir, renomeie para `.py`.
+> As figuras (EDA, matrizes de confusão “bruta” e normalizada, confusão por *script*, barras de F1 etc.) entram em `plots_*` automaticamente.
 
 ---
 
-## ⚙️ Instalação rápida
+## 🧠 Modelos e representações incluídos
 
-1) **Crie e ative** um ambiente virtual
+**Sempre disponíveis**  
+- **TF‑IDF (caracteres 2–5)** + **LinearSVC**  
+- **TF‑IDF (palavras 1–2)** + **LogisticRegression**
+
+**Se as libs estiverem instaladas**  
+- **CountVectorizer (caracteres)** + **MultinomialNB**  
+- **Word2Vec**/**Doc2Vec** (via `gensim`) + **LogisticRegression**  
+- **TF‑IDF (palavras)** → **SVD** → **XGBoost** (multi‑classe), com suporte a **GPU**
+
+Cada experimento é ajustado por *grid* e comparado por **macro‑F1** na validação. O **melhor** é *refit* em **train+val** e avaliado no **TEST**.
+
+---
+
+## 📊 Métricas e relatórios
+
+- **Accuracy**, **F1 macro/micro** (val/test)  
+- **Top‑3 accuracy**  
+- **Relatório por classe** + **matriz de confusão** (bruta e normalizada)  
+- **Métricas agregadas por *script*** (Latin, CJK, Árabe etc.) e **confusão por *script***  
+- **Anti-overfitting:** OOF (*out‑of‑fold*), *learning curve*, **Y‑scramble** (múltiplas repetições)
+
+---
+
+## ⚙️ Instalação
+
 ```bash
+# 1) Crie um ambiente
 python -m venv .venv
-# Windows: 
+# Windows
 .venv\Scripts\activate
-# macOS/Linux:
+# macOS/Linux
 source .venv/bin/activate
+
+# 2) Instale dependências
+pip install -U pandas numpy scikit-learn matplotlib joblib kagglehub
+# (opcionais)
+pip install -U gensim xgboost
 ```
 
-2) **Instale dependências**
-```bash
-pip install -r requirements.txt
-```
-
-3) **Baixe recursos NLTK e modelo spaCy (opcional, recomendado)**
-```bash
-python scripts/00_setup_env.txt --with-spacy
-```
-
-4) **Configure a API do Kaggle**  
-Crie `~/.kaggle/kaggle.json` com suas credenciais ou defina `KAGGLE_USERNAME` e `KAGGLE_KEY` no ambiente.
-
-5) **Baixe o dataset**
-```bash
-python scripts/01_download_kaggle.txt
-```
-
-6) **Pré-processamento (tokenização, normalização, stopwords, stemming/lematização)**  
-```bash
-python scripts/02_preprocess.txt --strip-accents false --lemmatize true --stem false
-```
-
-7) **Treinar modelos de baseline (TF‑IDF / char n‑grams)**
-```bash
-python scripts/03_vectorize_train_baselines.txt --models mnb,logreg,svm
-```
-
-8) **Embeddings (FastText via gensim) + modelos**
-```bash
-python scripts/04_embeddings_fasttext_train.txt --models logreg,svm
-```
-
-9) **Consolidar resultados e escolher o melhor**
-```bash
-python scripts/05_evaluate_compare.txt
-```
-
-10) **Inferência por CLI**
-```bash
-python scripts/06_inference_cli.txt --text "Gostei muito do atendimento, excelente!"
-```
-
-11) **API FastAPI**
-```bash
-uvicorn scripts.07_api_fastapi:app --reload
-# ou
-python scripts/07_api_fastapi.txt
-```
+> Para baixar do Kaggle via `kagglehub`, configure suas credenciais do Kaggle (ou baixe o CSV manualmente e aponte `LANGID_CSV`).
 
 ---
 
-## 🧪 Modelos testados e métricas
+## ▶️ Execução rápida
 
-- **Multinomial Naive Bayes** (bag-of-words / TF‑IDF)
-- **Logistic Regression** (TF‑IDF e embeddings)
-- **Linear SVM** (TF‑IDF e embeddings)
+### (A) Usando download automático (kagglehub)
+```bash
+python lid22.py
+```
 
-Métricas reportadas (validação e teste): *accuracy*, *precision/recall/F1 macro e weighted*, *AUC micro/macro (multiclasse, quando aplicável)*, *matriz de confusão* e *leaderboard* consolidado.
+### (B) Indicando o CSV localmente
+```bash
+# Windows (PowerShell)
+$env:LANGID_CSV="C:\caminho\para\language.csv"; python lid22.py
 
----
+# macOS/Linux
+LANGID_CSV=/caminho/para/language.csv python lid22.py
+```
 
-## 🧠 Pré-processamento e PLN (resumo do que os scripts fazem)
-
-- **Tokenização:** spaCy (pt) se disponível; fallback com regex/NLTK.
-- **Normalização:** lowercasing, URLs/menções/hashtags, risadas (“kkkk”), repetição de letras, números e pontuação.
-- **Stopwords:** NLTK + lista customizada (“rt”, “via”, etc.).
-- **Stemming/Lematização:** RSLPStemmer (NLTK) e/ou lematização spaCy (`pt_core_news_sm`).
-- **Vetorização:** TF‑IDF (palavras e caracteres), *n‑grams*, `min_df`/`max_df` configuráveis.
-- **Embeddings:** FastText (gensim) treinado no corpus → vetor de documento por média de vetores de palavras.
-- **Seleção de modelo:** *GridSearchCV* com validação estratificada, `class_weight='balanced'` quando suportado.
-- **Persistência:** modelos/vecs em `models/artifacts/` + métricas em `models/reports/`.
+Durante a execução você verá: amostras, colunas detectadas, EDA, *grid* por experimento, leaderboard de validação, avaliação final no **TEST**, diagnósticos anti‑overfitting e caminhos dos artefatos salvos.
 
 ---
 
-## 🔎 Sobre o dataset
+## 🧩 Variáveis de ambiente (principais)
 
-- Repositório Kaggle: *Portuguese Tweets for Sentiment Analysis* – tweets em **português** rotulados em **positivo**, **negativo** e **neutro**.
-- Colunas (exemplos comuns no conjunto): `id`, `tweet_text`, `tweet_date`, `sentiment`, `query_used`.
-- O pipeline detecta automaticamente o arquivo principal em `data/raw/` e a coluna de texto/label, com *fallbacks* configuráveis em `config/config.yml.txt`.
+| Variável            | Default | Descrição |
+|---|---:|---|
+| `LANGID_CSV`        | —      | Caminho para o CSV (se **não** quiser usar `kagglehub`). |
+| `RUN_HEAVY`         | `1`    | Ativa modelos “pesados”/extras (NB, W2V/D2V, XGB…). Use `0` p/ rodar só o essencial. |
+| `SKIP_EDA`          | `0`    | Pula as análises/plots exploratórios. |
+| `CV_FOLDS`          | `3`    | Número de dobras no CV. |
+| `SEARCH_SUBSAMPLE`  | `0`    | Se >0, usa apenas N exemplos do *train* no *grid* (rápido p/ *smoke test*). |
+| `GS_N_JOBS`         | `CPU`  | *Workers* no *grid*. (`loky`) |
+| `USE_HALVING`       | `0`    | Usa `HalvingGridSearchCV` (se disponível). |
+| `SPLIT_BY_GROUPS`   | `1`    | *Split* 80/10/10 estratificado por **grupos (hash do texto)** → evita vazamento. |
+| `ANTI_OVERFITTING`  | `1`    | Executa OOF, *learning curve* e **Y‑scramble**. |
+| `Y_SCRAMBLE_N`      | `5`    | Nº de repetições no Y‑scramble. |
+| `CALIB_AT_END`      | `0`    | Calibra **LinearSVC** com `CalibratedClassifierCV` (sigmoid, cv=3). |
+| `XGB_USE_GPU`       | `0`    | Define `gpu_hist`/`gpu_predictor` no XGBoost (se GPU disponível). |
+| `W2V_WORKERS`       | `1`    | *Workers* para treinar Word2Vec/Doc2Vec. |
+| `SKL_CACHE`         | —      | Cache do `Pipeline`. No Windows é **desabilitado** por padrão p/ evitar *PicklingError*. |
 
 ---
 
-## ✍️ Licença
+## 🧪 Exemplo de inferência (fora do `main`)
 
-MIT – use livremente com atribuição. Dados do Kaggle seguem a licença do fornecedor.
+Depois de uma execução, carregue o melhor pipeline salvo:
+
+```python
+import joblib
+pipe = joblib.load("artifacts/best_langid_<melhor_experimento>.joblib")
+
+textos = [
+    "A vida é bela e a modelagem de dados é fascinante.",
+    "The quick brown fox jumps over the lazy dog.",
+    "هذا مثال لجملة قصيرة باللغة العربية."
+]
+preds = pipe.predict(textos)
+print(list(zip(textos, preds)))
+```
+
+> O script também imprime predições em 5 frases de exemplo ao final do `main`.
+
+---
+
+## 🔍 Boas práticas de robustez implementadas
+
+- **Normalização NFKC** + *casefold* heurístico (para textos latinos)  
+- **Padronização de rótulos** (ex.: “Portugese” → “Portuguese”)  
+- **Split por grupos** (hash de texto normalizado) para evitar duplicatas cruzando *splits*  
+- **Relatórios detalhados** + amostras de erros por par (y\_true/y\_pred)  
+- **Métricas por *script*** para entender confusões entre famílias de escrita
+
+---
+
+## 🆘 Troubleshooting
+
+- **Falha no download Kaggle (`kagglehub`)** → Baixe manualmente e defina **`LANGID_CSV`**.  
+- **Sem `xgboost`/`gensim`** → Eles são **opcionais**; o script executa os básicos (TF‑IDF + LinearSVC/LogReg).  
+- **Windows / erro de *pickle* no cache** → O cache do `Pipeline` é **desligado automaticamente** no Windows.  
+- **Execução rápida**: `SKIP_EDA=1 RUN_HEAVY=0 SEARCH_SUBSAMPLE=5000 python lid22.py`.
+
+---
+
+## 📜 Licença
+
+Defina a licença que preferir (ex.: **MIT**). Respeite a licença e termos do **dataset** no Kaggle.
+
+---
+
+## ✨ Agradecimentos
+
+Baseado no script `lid22.py` com foco em reprodutibilidade, diagnóstico anti‑overfitting e rastreabilidade de artefatos.
