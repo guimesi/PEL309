@@ -1,0 +1,22 @@
+{
+  "train": {
+    "unique": 17486,
+    "dups_keys": 28,
+    "extra_rows_from_dups": 117
+  },
+  "val": {
+    "unique": 2186,
+    "dups_keys": 5,
+    "extra_rows_from_dups": 9
+  },
+  "test": {
+    "unique": 2186,
+    "dups_keys": 5,
+    "extra_rows_from_dups": 15
+  },
+  "cross_split_duplicates": {
+    "train_val": 0,
+    "train_test": 0,
+    "val_test": 0
+  }
+}

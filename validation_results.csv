@@ -1,0 +1,7 @@
+exp,best_params,val_acc,val_f1_macro,val_f1_micro,train_time_sec
+tfidf_char_linsvm,"{'clf__C': 2.0, 'prep__do_normalize': True, 'prep__lowercase': None, 'vec__max_features': 150000, 'vec__min_df': 3, 'vec__ngram_range': (2, 5)}",0.9863325740318907,0.9865303362699933,0.9863325740318907,60.74825954437256
+count_char_nb,"{'clf__alpha': 0.5, 'prep__do_normalize': True, 'prep__lowercase': None, 'vec__max_features': 150000, 'vec__min_df': 5, 'vec__ngram_range': (2, 5)}",0.9776765375854214,0.978462413266174,0.9776765375854214,182.3767385482788
+xgb_tfidf_word,"{'clf__estimator__learning_rate': 0.15, 'clf__estimator__max_depth': 5, 'clf__estimator__n_estimators': 300, 'prep__do_normalize': True, 'prep__lowercase': None, 'svd__n_components': 256}",0.9567198177676538,0.9561810805801959,0.9567198177676538,346.69156527519226
+tfidf_word_logreg,"{'clf__C': 2.0, 'prep__do_normalize': True, 'prep__lowercase': None, 'vec__max_features': 200000, 'vec__min_df': 3, 'vec__ngram_range': (1, 2)}",0.952619589977221,0.9534950661134377,0.952619589977221,17.63552975654602
+w2v_logreg,"{'clf__C': 2.0, 'prep__do_normalize': True, 'prep__lowercase': None, 'w2v__size': 150, 'w2v__window': 5}",0.9494305239179954,0.9498176957973289,0.9494305239179954,80.22591304779053
+d2v_logreg,"{'clf__C': 2.0, 'd2v__size': 150, 'd2v__window': 5, 'prep__do_normalize': True, 'prep__lowercase': None}",0.7849658314350797,0.7921338430152882,0.7849658314350797,163.41110491752625

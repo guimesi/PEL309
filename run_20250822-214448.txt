@@ -1,0 +1,446 @@
+[i] Logging ativo. Output -> C:\Users\Guilherme\Downloads\artifacts\run_20250822-214448.txt
+[i] Plots -> C:\Users\Guilherme\Downloads\artifacts\plots_20250822-214448
+[i] GridSearch backend = 'loky', n_jobs = 24 (IN_NOTEBOOK=False)
+[i] Windows detectado → desativando cache do Pipeline (evita PicklingError).
+Baixando dataset via kagglehub ...
+Usando arquivo: C:\Users\Guilherme\.cache\kagglehub\datasets\zarajamshaid\language-identification-datasst\versions\1\dataset.csv
+Amostras e colunas: (22000, 2) ['Text', 'language']
+Coluna de TEXTO: 'Text' | Coluna de RÓTULO: 'language'
+[i] Canonizando rótulos: 'Portugese' -> 'Portuguese' (ocorrências: 1000)
+
+===== EDA: Distribuição de classes =====
+language
+Estonian      1000
+Swedish       1000
+English       1000
+Russian       1000
+Romanian      1000
+Persian       1000
+Pushto        1000
+Spanish       1000
+Hindi         1000
+Korean        1000
+Chinese       1000
+French        1000
+Portuguese    1000
+Indonesian    1000
+Urdu          1000
+Latin         1000
+Turkish       1000
+Japanese      1000
+Tamil         1000
+Thai          1000
+Arabic        1000
+Dutch          999
+Name: count, dtype: int64
+[plot] Figura salva: C:\Users\Guilherme\Downloads\artifacts\plots_20250822-214448\eda_class_distribution.png
+
+===== EDA: Comprimentos =====
+
+Resumo global de comprimentos (caracteres):
+count    21999.000000
+mean       356.047548
+std        238.610056
+min          8.000000
+25%        187.000000
+50%        274.000000
+75%        441.000000
+max       1341.000000
+Name: len, dtype: float64
+[plot] Figura salva: C:\Users\Guilherme\Downloads\artifacts\plots_20250822-214448\eda_length_hist_global.png
+[plot] Figura salva: C:\Users\Guilherme\Downloads\artifacts\plots_20250822-214448\eda_length_boxplot_by_language.png
+
+===== EDA: Top char n-grams =====
+
+Top 10 char 3-grams para [Estonian]:
+'ja ': 633
+' ja': 572
+'se ': 569
+'ast': 551
+'st ': 543
+'ist': 484
+'on ': 471
+'sta': 460
+' ka': 455
+'ise': 446
+
+Top 10 char 3-grams para [Swedish]:
+'en ': 2542
+'er ': 1252
+' de': 1109
+'är ': 1048
+' i ': 999
+' är': 994
+'den': 993
+'et ': 704
+'ter': 669
+' me': 644
+
+Top 10 char 3-grams para [English]:
+' th': 2402
+'the': 2286
+'he ': 2205
+'ed ': 1225
+' in': 1133
+' an': 1049
+'nd ': 1000
+'and': 990
+'in ': 959
+'er ': 930
+
+Top 10 char 3-grams para [Russian]:
+' в ': 965
+' пр': 874
+' по': 850
+' на': 761
+' и ': 723
+'ой ': 710
+'го ': 671
+'ени': 662
+'ско': 551
+'ого': 531
+
+Top 10 char 3-grams para [Romanian]:
+' de': 1454
+'de ': 1196
+' în': 1010
+'te ': 795
+'ul ': 779
+'în ': 750
+'re ': 706
+'are': 675
+' a ': 660
+'și ': 639
+
+Top 10 char 3-grams para [Persian]:
+' در': 1691
+'در ': 1537
+'ان ': 1415
+' و ': 1410
+'ای ': 1135
+'ین ': 1124
+' به': 1106
+'به ': 1079
+'از ': 972
+'است': 913
+[i] SPLIT_BY_GROUPS=1 → criando grupos por hash do texto normalizado (sem vazamento).
+
+Split: 17603 treino | 2195 val | 2201 teste
+
+=== Balanceamento por split (% por classe) ===
+
+TRAIN:
+            count   pct
+Arabic        799  4.54
+Chinese       800  4.54
+Dutch         796  4.52
+English       800  4.54
+Estonian      800  4.54
+French        802  4.56
+Hindi         801  4.55
+Indonesian    791  4.49
+Japanese      800  4.54
+Korean        800  4.54
+Latin         809  4.60
+Persian       800  4.54
+Portuguese    800  4.54
+Pushto        799  4.54
+Romanian      800  4.54
+Russian       800  4.54
+Spanish       801  4.55
+Swedish       801  4.55
+Tamil         804  4.57
+Thai          800  4.54
+Turkish       800  4.54
+Urdu          800  4.54
+
+VAL:
+            count   pct
+Arabic        101  4.60
+Chinese       100  4.56
+Dutch         104  4.74
+English       100  4.56
+Estonian      100  4.56
+French         99  4.51
+Hindi          99  4.51
+Indonesian    100  4.56
+Japanese      100  4.56
+Korean        100  4.56
+Latin          95  4.33
+Persian       100  4.56
+Portuguese    100  4.56
+Pushto        100  4.56
+Romanian      100  4.56
+Russian       100  4.56
+Spanish       100  4.56
+Swedish        99  4.51
+Tamil          98  4.46
+Thai          100  4.56
+Turkish       100  4.56
+Urdu          100  4.56
+
+TEST:
+            count   pct
+Arabic        100  4.54
+Chinese       100  4.54
+Dutch          99  4.50
+English       100  4.54
+Estonian      100  4.54
+French         99  4.50
+Hindi         100  4.54
+Indonesian    109  4.95
+Japanese      100  4.54
+Korean        100  4.54
+Latin          96  4.36
+Persian       100  4.54
+Portuguese    100  4.54
+Pushto        101  4.59
+Romanian      100  4.54
+Russian       100  4.54
+Spanish        99  4.50
+Swedish       100  4.54
+Tamil          98  4.45
+Thai          100  4.54
+Turkish       100  4.54
+Urdu          100  4.54
+
+Resumo do desvio-padrão das % por classe entre splits (menor = melhor):
+count    22.000000
+mean      0.040904
+std       0.059784
+min       0.011547
+25%       0.011547
+50%       0.011547
+75%       0.032146
+max       0.247857
+Name: pct_std, dtype: float64
+
+== Treinando/ajustando: tfidf_char_linsvm ==
+Grid: {'prep__do_normalize': [True], 'prep__lowercase': [None], 'vec__ngram_range': [(2, 5)], 'vec__min_df': [3], 'vec__max_features': [150000], 'clf__C': [0.5, 1.0, 2.0]}
+Fitting 3 folds for each of 3 candidates, totalling 9 fits
+[i] CV results salvos em: C:\Users\Guilherme\Downloads\artifacts\cv_results_tfidf_char_linsvm.csv
+[tfidf_char_linsvm] val_acc=0.9863 | val_macroF1=0.9865 | params={'clf__C': 2.0, 'prep__do_normalize': True, 'prep__lowercase': None, 'vec__max_features': 150000, 'vec__min_df': 3, 'vec__ngram_range': (2, 5)} | tempo=1.0 min
+
+== Treinando/ajustando: tfidf_word_logreg ==
+Grid: {'prep__do_normalize': [True], 'prep__lowercase': [None, True], 'vec__ngram_range': [(1, 1), (1, 2)], 'vec__min_df': [3], 'vec__max_features': [200000], 'clf__C': [0.5, 1.0, 2.0]}
+Fitting 3 folds for each of 12 candidates, totalling 36 fits
+[i] CV results salvos em: C:\Users\Guilherme\Downloads\artifacts\cv_results_tfidf_word_logreg.csv
+[tfidf_word_logreg] val_acc=0.9526 | val_macroF1=0.9535 | params={'clf__C': 2.0, 'prep__do_normalize': True, 'prep__lowercase': None, 'vec__max_features': 200000, 'vec__min_df': 3, 'vec__ngram_range': (1, 2)} | tempo=0.3 min
+
+== Treinando/ajustando: count_char_nb ==
+Grid: {'prep__do_normalize': [True], 'prep__lowercase': [None], 'vec__ngram_range': [(2, 5), (3, 6)], 'vec__min_df': [2, 5], 'vec__max_features': [120000, 150000], 'clf__alpha': [0.5, 1.0, 2.0]}
+Fitting 3 folds for each of 24 candidates, totalling 72 fits
+[i] CV results salvos em: C:\Users\Guilherme\Downloads\artifacts\cv_results_count_char_nb.csv
+[count_char_nb] val_acc=0.9777 | val_macroF1=0.9785 | params={'clf__alpha': 0.5, 'prep__do_normalize': True, 'prep__lowercase': None, 'vec__max_features': 150000, 'vec__min_df': 5, 'vec__ngram_range': (2, 5)} | tempo=3.0 min
+
+== Treinando/ajustando: w2v_logreg ==
+Grid: {'prep__do_normalize': [True], 'prep__lowercase': [None], 'w2v__size': [150, 200], 'w2v__window': [5], 'clf__C': [1.0, 2.0]}
+Fitting 3 folds for each of 4 candidates, totalling 12 fits
+[i] CV results salvos em: C:\Users\Guilherme\Downloads\artifacts\cv_results_w2v_logreg.csv
+[w2v_logreg] val_acc=0.9494 | val_macroF1=0.9498 | params={'clf__C': 2.0, 'prep__do_normalize': True, 'prep__lowercase': None, 'w2v__size': 150, 'w2v__window': 5} | tempo=1.3 min
+
+== Treinando/ajustando: d2v_logreg ==
+Grid: {'prep__do_normalize': [True], 'prep__lowercase': [None], 'd2v__size': [150, 200], 'd2v__window': [5], 'clf__C': [1.0, 2.0]}
+Fitting 3 folds for each of 4 candidates, totalling 12 fits
+[i] CV results salvos em: C:\Users\Guilherme\Downloads\artifacts\cv_results_d2v_logreg.csv
+[d2v_logreg] val_acc=0.7850 | val_macroF1=0.7921 | params={'clf__C': 2.0, 'd2v__size': 150, 'd2v__window': 5, 'prep__do_normalize': True, 'prep__lowercase': None} | tempo=2.7 min
+
+== Treinando/ajustando: xgb_tfidf_word ==
+Grid: {'prep__do_normalize': [True], 'prep__lowercase': [None], 'svd__n_components': [128, 256], 'clf__estimator__n_estimators': [200, 300], 'clf__estimator__max_depth': [5, 7], 'clf__estimator__learning_rate': [0.15, 0.2]}
+Fitting 3 folds for each of 16 candidates, totalling 48 fits
+[i] CV results salvos em: C:\Users\Guilherme\Downloads\artifacts\cv_results_xgb_tfidf_word.csv
+[xgb_tfidf_word] val_acc=0.9567 | val_macroF1=0.9562 | params={'clf__estimator__learning_rate': 0.15, 'clf__estimator__max_depth': 5, 'clf__estimator__n_estimators': 300, 'prep__do_normalize': True, 'prep__lowercase': None, 'svd__n_components': 256} | tempo=5.8 min
+
+Resumo validação (ordenado por Macro-F1):
+                 exp                                        best_params   val_acc  val_f1_macro  val_f1_micro  train_time_sec
+0  tfidf_char_linsvm  {'clf__C': 2.0, 'prep__do_normalize': True, 'p...  0.986333      0.986530      0.986333       60.748260
+2      count_char_nb  {'clf__alpha': 0.5, 'prep__do_normalize': True...  0.977677      0.978462      0.977677      182.376739
+5     xgb_tfidf_word  {'clf__estimator__learning_rate': 0.15, 'clf__...  0.956720      0.956181      0.956720      346.691565
+1  tfidf_word_logreg  {'clf__C': 2.0, 'prep__do_normalize': True, 'p...  0.952620      0.953495      0.952620       17.635530
+3         w2v_logreg  {'clf__C': 2.0, 'prep__do_normalize': True, 'p...  0.949431      0.949818      0.949431       80.225913
+4         d2v_logreg  {'clf__C': 2.0, 'd2v__size': 150, 'd2v__window...  0.784966      0.792134      0.784966      163.411105
+[i] Resultados de validação salvos em: C:\Users\Guilherme\Downloads\artifacts\validation_results.csv
+[plot] Figura salva: C:\Users\Guilherme\Downloads\artifacts\plots_20250822-214448\results_val_macroF1_by_experiment.png
+
+>> Melhor experimento (val): tfidf_char_linsvm | val_macroF1=0.9865
+
+>> Avaliação FINAL no TEST com refit(train+val):
+
+TEST | accuracy=0.9886 | macroF1=0.9889 | microF1=0.9886
+
+Classification report:
+              precision    recall  f1-score   support
+
+      Arabic       1.00      1.00      1.00       100
+     Chinese       0.99      0.99      0.99       100
+       Dutch       1.00      1.00      1.00        99
+     English       0.85      1.00      0.92       100
+    Estonian       0.99      0.99      0.99       100
+      French       0.98      1.00      0.99        99
+       Hindi       1.00      0.98      0.99       100
+  Indonesian       0.99      1.00      1.00       109
+    Japanese       1.00      0.99      0.99       100
+      Korean       1.00      0.99      0.99       100
+       Latin       0.99      0.98      0.98        96
+     Persian       1.00      0.98      0.99       100
+  Portuguese       1.00      0.99      0.99       100
+      Pushto       1.00      0.95      0.97       101
+    Romanian       1.00      0.99      0.99       100
+     Russian       0.99      0.99      0.99       100
+     Spanish       0.99      0.99      0.99        99
+     Swedish       1.00      1.00      1.00       100
+       Tamil       1.00      0.98      0.99        98
+        Thai       1.00      0.99      0.99       100
+     Turkish       1.00      0.99      0.99       100
+        Urdu       1.00      0.98      0.99       100
+
+    accuracy                           0.99      2201
+   macro avg       0.99      0.99      0.99      2201
+weighted avg       0.99      0.99      0.99      2201
+
+[i] Classification report salvo em: C:\Users\Guilherme\Downloads\artifacts\classification_report_test_tfidf_char_linsvm.json
+[plot] Figura salva: C:\Users\Guilherme\Downloads\artifacts\plots_20250822-214448\confusion_matrix_test_tfidf_char_linsvm.png
+[plot] Figura salva: C:\Users\Guilherme\Downloads\artifacts\plots_20250822-214448\confusion_matrix_norm_test_tfidf_char_linsvm.png
+Top-3 accuracy (TEST): 0.9945
+
+Métricas agregadas por SCRIPT:
+- Arabic: precision=1.000 | recall=0.978 | f1=0.989 | support=401.0
+- CJK: precision=0.995 | recall=0.990 | f1=0.992 | support=200.0
+- Cyrillic: precision=0.990 | recall=0.990 | f1=0.990 | support=100.0
+- Devanagari: precision=1.000 | recall=0.980 | f1=0.990 | support=100.0
+- Hangul: precision=1.000 | recall=0.990 | f1=0.995 | support=100.0
+- Latin: precision=0.985 | recall=0.999 | f1=0.992 | support=1102.0
+- Tamil: precision=1.000 | recall=0.980 | f1=0.990 | support=98.0
+- Thai: precision=1.000 | recall=0.990 | f1=0.995 | support=100.0
+[plot] Figura salva: C:\Users\Guilherme\Downloads\artifacts\plots_20250822-214448\script_confusion_test_tfidf_char_linsvm.png
+
+Pares mais confundidos (top 10):
+      y_true    y_pred  count
+10    Pushto   English      5
+17      Urdu   English      2
+2      Hindi   English      2
+14     Tamil   English      2
+16   Turkish  Estonian      1
+15      Thai   English      1
+13   Spanish   English      1
+12   Russian     Latin      1
+11  Romanian   English      1
+0    Chinese   English      1
+[i] Exemplos de erros salvos em: C:\Users\Guilherme\Downloads\artifacts\errors_test_tfidf_char_linsvm.csv
+[anti-of] Checagem de duplicatas/leakage salva em: C:\Users\Guilherme\Downloads\artifacts\diag_text_leakage.json
+
+[anti-of] Gerando OOF (out-of-fold) predictions...
+[anti-of] OOF macro-F1 = 0.9878
+[anti-of] OOF report salvo em: C:\Users\Guilherme\Downloads\artifacts\oof_report_tfidf_char_linsvm.json
+[plot] Figura salva: C:\Users\Guilherme\Downloads\artifacts\plots_20250822-214448\oof_confusion_tfidf_char_linsvm.png
+
+[anti-of] Gerando Learning Curve...
+[anti-of] Learning curve CSV salvo em: C:\Users\Guilherme\Downloads\artifacts\learning_curve_tfidf_char_linsvm.csv
+[plot] Figura salva: C:\Users\Guilherme\Downloads\artifacts\plots_20250822-214448\learning_curve_tfidf_char_linsvm.png
+
+[anti-of] Rodando Y-Scramble com 5 repetições...
+[anti-of] Y-scramble rep 1: macro-F1=0.0479 | acc=0.0478
+[anti-of] Y-scramble rep 2: macro-F1=0.0443 | acc=0.0442
+[anti-of] Y-scramble rep 3: macro-F1=0.0466 | acc=0.0469
+[anti-of] Y-scramble rep 4: macro-F1=0.0496 | acc=0.0497
+[anti-of] Y-scramble rep 5: macro-F1=0.0494 | acc=0.0497
+[anti-of] Y-scramble CSV salvo em: C:\Users\Guilherme\Downloads\artifacts\diag_y_scramble_tfidf_char_linsvm.csv
+[anti-of] Y-scramble média macro-F1 = 0.0476 ± 0.0022
+
+Modelo salvo em: C:\Users\Guilherme\Downloads\artifacts\best_langid_tfidf_char_linsvm.joblib
+
+=== Balanceamento por split (% por classe) ===
+
+TRAIN:
+            count   pct
+Arabic        799  4.54
+Chinese       800  4.54
+Dutch         796  4.52
+English       800  4.54
+Estonian      800  4.54
+French        802  4.56
+Hindi         801  4.55
+Indonesian    791  4.49
+Japanese      800  4.54
+Korean        800  4.54
+Latin         809  4.60
+Persian       800  4.54
+Portuguese    800  4.54
+Pushto        799  4.54
+Romanian      800  4.54
+Russian       800  4.54
+Spanish       801  4.55
+Swedish       801  4.55
+Tamil         804  4.57
+Thai          800  4.54
+Turkish       800  4.54
+Urdu          800  4.54
+
+VAL:
+            count   pct
+Arabic        101  4.60
+Chinese       100  4.56
+Dutch         104  4.74
+English       100  4.56
+Estonian      100  4.56
+French         99  4.51
+Hindi          99  4.51
+Indonesian    100  4.56
+Japanese      100  4.56
+Korean        100  4.56
+Latin          95  4.33
+Persian       100  4.56
+Portuguese    100  4.56
+Pushto        100  4.56
+Romanian      100  4.56
+Russian       100  4.56
+Spanish       100  4.56
+Swedish        99  4.51
+Tamil          98  4.46
+Thai          100  4.56
+Turkish       100  4.56
+Urdu          100  4.56
+
+TEST:
+            count   pct
+Arabic        100  4.54
+Chinese       100  4.54
+Dutch          99  4.50
+English       100  4.54
+Estonian      100  4.54
+French         99  4.50
+Hindi         100  4.54
+Indonesian    109  4.95
+Japanese      100  4.54
+Korean        100  4.54
+Latin          96  4.36
+Persian       100  4.54
+Portuguese    100  4.54
+Pushto        101  4.59
+Romanian      100  4.54
+Russian       100  4.54
+Spanish        99  4.50
+Swedish       100  4.54
+Tamil          98  4.45
+Thai          100  4.54
+Turkish       100  4.54
+Urdu          100  4.54
+
+Resumo do desvio-padrão das % por classe entre splits (menor = melhor):
+count    22.000000
+mean      0.040904
+std       0.059784
+min       0.011547
+25%       0.011547
+50%       0.011547
+75%       0.032146
+max       0.247857
+Name: pct_std, dtype: float64
+Metadados salvos em: C:\Users\Guilherme\Downloads\artifacts\metadata_ext.json
+
+Predições (melhor experimento refit) em frases de exemplo:
+- (Portuguese) A vida é bela e a modelagem de dados é fascinante.
+- (English) The quick brown fox jumps over the lazy dog.
+- (Arabic) هذا مثال لجملة قصيرة باللغة العربية.
+- (Japanese) これは日本語の短い文章の例です。
+- (Russian) Проверка классификатора на русском языке.
