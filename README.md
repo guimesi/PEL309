@@ -169,10 +169,5 @@ print(list(zip(textos, preds)))
 
 ## 📜 Licença
 
-Defina a licença que preferir (ex.: **MIT**). Respeite a licença e termos do **dataset** no Kaggle.
-
----
-
-## ✨ Agradecimentos
-
+Respeita a licença e termos do **dataset** no Kaggle.
 Baseado no script `lid22.py` com foco em reprodutibilidade, diagnóstico anti‑overfitting e rastreabilidade de artefatos.
